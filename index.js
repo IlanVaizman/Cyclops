@@ -64,6 +64,8 @@ async function main() {
     
     if (users.length) {
         UserProcessor.processUsers(users);
+    } else {
+        logger.warn("No users found to process.");
     }
 }
 
