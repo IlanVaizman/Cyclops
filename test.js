@@ -62,7 +62,7 @@ describe('UserFetcher', () => {
          });
     });
 
-    test('fetchUsers should return empty array when API request fails', async () => {
+    test('fetchUsers should throw an error when the API request fails', async () => {
         const errorMessage = 'Network Error';
         axios.get.mockRejectedValue(new Error(errorMessage));
         
