@@ -70,22 +70,22 @@ describe('UserProcessor', () => {
     });
 
 
-        test("processUsers should log valid and unvalid users", () => {
-            const mockUsers = [
-                { id: 1, name: "Correct User", email: "correct@gmail.com", company: { name: "someName" } },
-                { id: 2, name: "Invalid User", email: "invalid-email", company: { name: "someName" } }
-            ];
+    test("processUsers should log valid and unvalid users", () => {
+        const mockUsers = [
+            { id: 1, name: "Correct User", email: "correct@gmail.com", company: { name: "someName" } },
+            { id: 2, name: "Invalid User", email: "invalid-email", company: { name: "someName" } }
+        ];
     
-            const logger = winston.createLogger();
+        const logger = winston.createLogger();
     
-            UserProcessor.processUsers(mockUsers);
+        UserProcessor.processUsers(mockUsers);
     
-            expect(logger.info).toHaveBeenCalledWith(
-                expect.stringContaining(`ID: ${mockUsers[0].id}, Name: ${mockUsers[0].name}, Email: ${mockUsers[0].email}, Company: ${mockUsers[0].company.name}`)
-            );
+        expect(logger.info).toHaveBeenCalledWith(
+            expect.stringContaining(`ID: ${mockUsers[0].id}, Name: ${mockUsers[0].name}, Email: ${mockUsers[0].email}, Company: ${mockUsers[0].company.name}`)
+        );
     
-            expect(logger.error).toHaveBeenCalledWith(
-                expect.stringContaining(`Invalid email for user ID ${mockUsers[1].id}: ${mockUsers[1].email}`)
-            );
-        });
+        expect(logger.error).toHaveBeenCalledWith(
+            expect.stringContaining(`Invalid email for user ID ${mockUsers[1].id}: ${mockUsers[1].email}`)
+        );
+    });
 });
