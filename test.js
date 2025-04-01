@@ -60,7 +60,6 @@ describe('UserFetcher', () => {
             axios.get.mockResolvedValue({ status: 200, data: input });
             await expect(UserFetcher.fetchUsers()).rejects.toThrow(errorMessage);
         }
-        
     });
 
     test('fetchUsers should throw an error when the API request fails', async () => {
@@ -93,7 +92,6 @@ describe('UserProcessor', () => {
         expect(UserProcessor.isValidEmail('test@domain..com')).toBe(false);
         expect(UserProcessor.isValidEmail('test@domain.com..il')).toBe(false);
         expect(UserProcessor.isValidEmail('test@domain..com..il')).toBe(false);
-
     });
 
 
