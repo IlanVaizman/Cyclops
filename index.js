@@ -71,7 +71,8 @@ async function main() {
 
 module.exports = {
     UserFetcher,
-    UserProcessor
+    UserProcessor,
+    logger
 };
 
 if (require.main === module) {

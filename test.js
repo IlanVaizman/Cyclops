@@ -1,4 +1,4 @@
-const { UserFetcher, UserProcessor } = require('./index.js');
+const { UserFetcher, UserProcessor , logger} = require('./index.js');
 const axios = require('axios');
 const winston = require('winston');
 
@@ -20,8 +20,6 @@ jest.mock('winston', () => {
         },
     };
 });
-
-const logger = winston.createLogger();
 
 afterEach(() => {
     jest.clearAllMocks();
