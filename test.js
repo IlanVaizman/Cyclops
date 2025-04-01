@@ -55,11 +55,12 @@ describe('UserFetcher', () => {
         axios.get.mockResolvedValue({ status: 404 });
         await expect(UserFetcher.fetchUsers()).rejects.toThrow(errorMessage);
 
-        const invalidInputs = ['dasdsad', 321321, true, false, null, undefined, {}];
-        invalidInputs.forEach(input => {
+        const invalidInputs = ['dasdsad', 321321, true, false, null, undefined, , {}];
+        for (const input of invalidInputs) {
             axios.get.mockResolvedValue({ status: 200, data: input });
-            expect(() => UserFetcher.fetchUsers()).rejects.toThrow(errorMessage);
-         });
+            await expect(UserFetcher.fetchUsers()).rejects.toThrow(errorMessage);
+        }
+        
     });
 
     test('fetchUsers should throw an error when the API request fails', async () => {
@@ -80,6 +81,9 @@ describe('UserProcessor', () => {
         
         // Invalid emails
         expect(UserProcessor.isValidEmail('')).toBe(false);
+        expect(UserProcessor.isValidEmail(null)).toBe(false);
+        expect(UserProcessor.isValidEmail(undefined)).toBe(false);
+        expect(UserProcessor.isValidEmail(12345)).toBe(false);
         expect(UserProcessor.isValidEmail('test@')).toBe(false);
         expect(UserProcessor.isValidEmail('test@domain')).toBe(false);
         expect(UserProcessor.isValidEmail('test')).toBe(false);
@@ -111,7 +115,7 @@ describe('UserProcessor', () => {
     });
 
     test('processUsers should throw an error when given invalid input types', () => {    
-        const invalidInputs = ['dasdsad', 321321, true, false, null, undefined, {}, []];
+        const invalidInputs = ['dasdsad', 321321, true, false, null, undefined, , {}, []];
 
         invalidInputs.forEach(input => {
            expect(() => UserProcessor.processUsers(input)).toThrow(
