@@ -48,16 +48,17 @@ describe('UserFetcher', () => {
 
     test('fetchUsers should return empty array when API response is invalid', async () => {
         axios.get.mockResolvedValue({ status: 200 });
-        const result = await UserFetcher.fetchUsers();
-        expect(result).toEqual([]);
+        await expect(UserFetcher.fetchUsers()).rejects.toThrow("Failed to fetch users: Cannot read properties of undefined (reading 'length')");
+
+        axios.get.mockResolvedValue({ status: 404 });
+        await expect(UserFetcher.fetchUsers()).rejects.toThrow("Failed to fetch users: Cannot read properties of undefined (reading 'length')");
     });
 
     test('fetchUsers should return empty array when API request fails', async () => {
         const errorMessage = 'Network Error';
         axios.get.mockRejectedValue(new Error(errorMessage));
         
-        const result = await UserFetcher.fetchUsers();
-        expect(result).toEqual([]);
+        await expect(UserFetcher.fetchUsers()).rejects.toThrow(`Failed to fetch users: ${errorMessage}`);
     });
 });
 
@@ -98,12 +99,13 @@ describe('UserProcessor', () => {
         );
     });
 
-    test('processUsers should do nothing when given an empty list', () => {
-        const logger = winston.createLogger();
-        
-        UserProcessor.processUsers([]);
-        
-        expect(logger.info).not.toHaveBeenCalled();
-        expect(logger.error).not.toHaveBeenCalled();
+    test('processUsers should throw an error when given invalid input types', () => {    
+        const invalidInputs = ['dasdsad', 321321, true, false, null, undefined, {}, []];
+
+        invalidInputs.forEach(input => {
+           expect(() => UserProcessor.processUsers(input)).toThrow(
+            "Invalid input: users must be an array and cannot be empty"
+           );
+        });
     });
 });

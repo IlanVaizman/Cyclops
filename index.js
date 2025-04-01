@@ -23,8 +23,7 @@ class UserFetcher {
             logger.info(`Fetch status: ${response.status} - Successfully fetched ${response.data.length} users`);
             return response.data;
         } catch (error) {
-            logger.error(`Failed to fetch users: ${error.message}`);
-            return [];
+            throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
 }
@@ -39,6 +38,10 @@ class UserProcessor {
     }
 
     static processUsers(users) {
+        if (!Array.isArray(users) || users.length === 0) {
+            throw new Error("Invalid input: users must be an array and cannot be empty");
+        }
+
         users.forEach(user => {
             const { id, name, email, company: { name: companyName } } = user;
 
@@ -64,4 +67,6 @@ module.exports = {
     UserProcessor
 };
 
-main();
+if (require.main === module) {
+    main();
+}
