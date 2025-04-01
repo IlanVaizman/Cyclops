@@ -70,13 +70,13 @@ describe('UserProcessor', () => {
     });
 
 
-        test("processUsers should log valid users", () => {
+        test("processUsers should log valid and unvalid users", () => {
             const mockUsers = [
-                { id: 1, name: "Correct User", email: "ilan@gmail.com", company: { name: "someName" } },
+                { id: 1, name: "Correct User", email: "correct@gmail.com", company: { name: "someName" } },
                 { id: 2, name: "Invalid User", email: "invalid-email", company: { name: "someName" } }
             ];
     
-            const logger = winston.createLogger(); // Get the mocked logger
+            const logger = winston.createLogger();
     
             UserProcessor.processUsers(mockUsers);
     
