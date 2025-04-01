@@ -20,6 +20,11 @@ class UserFetcher {
 
         try {
             const response = await axios.get(UserFetcher.API_URL);
+            
+            if (!response.data || !Array.isArray(response.data)) {
+                throw new Error("Invalid API response: Expected an array of users");
+            }
+            
             logger.info(`Fetch status: ${response.status} - Successfully fetched ${response.data.length} users`);
             return response.data;
         } catch (error) {

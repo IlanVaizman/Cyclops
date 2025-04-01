@@ -46,12 +46,20 @@ describe('UserFetcher', () => {
         expect(result).toEqual([]);
     });
 
-    test('fetchUsers should return empty array when API response is invalid', async () => {
-        axios.get.mockResolvedValue({ status: 200 }); // No data property in the response
-        await expect(UserFetcher.fetchUsers()).rejects.toThrow("Failed to fetch users: Cannot read properties of undefined (reading 'length')");
+    test('fetchUsers should throw error when API response is invalid', async () => {
+        const errorMessage = 'Failed to fetch users: Invalid API response: Expected an array of users';
+
+        axios.get.mockResolvedValue({ status: 200 });  // No data property in the response
+        await expect(UserFetcher.fetchUsers()).rejects.toThrow(errorMessage);
 
         axios.get.mockResolvedValue({ status: 404 });
-        await expect(UserFetcher.fetchUsers()).rejects.toThrow("Failed to fetch users: Cannot read properties of undefined (reading 'length')");
+        await expect(UserFetcher.fetchUsers()).rejects.toThrow(errorMessage);
+
+        const invalidInputs = ['dasdsad', 321321, true, false, null, undefined, {}];
+        invalidInputs.forEach(input => {
+            axios.get.mockResolvedValue({ status: 200, data: input });
+            expect(() => UserFetcher.fetchUsers()).rejects.toThrow(errorMessage);
+         });
     });
 
     test('fetchUsers should return empty array when API request fails', async () => {
