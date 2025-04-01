@@ -1,12 +1,32 @@
 const { UserFetcher, UserProcessor } = require('./index.js');
 const axios = require('axios');
+const winston = require('winston');
 
 jest.mock('axios');
 
+jest.mock('winston', () => {
+    const winstonMock = {
+        info: jest.fn(),
+        error: jest.fn(),
+    };
+
+    return {
+        format: {
+            simple: jest.fn(() => ({})),
+        },
+        createLogger: jest.fn(() => winstonMock),
+        transports: {
+            Console: jest.fn(),
+        },
+    };
+});
+
+
+afterEach(() => {
+    jest.clearAllMocks();
+});
+
 describe('UserFetcher', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
 
     test('fetchUsers should return data from API when request is successful', async () => {
         const mockUsers = [
@@ -19,9 +39,7 @@ describe('UserFetcher', () => {
     });
 
     test('fetchUsers should return empty array from API when there is no users', async () => {
-        const mockUsers = []
-        
-        axios.get.mockResolvedValue({ data: mockUsers, status: 200 });
+        axios.get.mockResolvedValue({ data: [], status: 200 });
         const result = await UserFetcher.fetchUsers();
         expect(result).toEqual([]);
     });
@@ -44,10 +62,30 @@ describe('UserProcessor', () => {
         expect(UserProcessor.isValidEmail('user-name@domain.org')).toBe(true);
         
         // Invalid emails
+        expect(UserProcessor.isValidEmail('')).toBe(false);
         expect(UserProcessor.isValidEmail('test@')).toBe(false);
         expect(UserProcessor.isValidEmail('test@domain')).toBe(false);
         expect(UserProcessor.isValidEmail('test')).toBe(false);
         expect(UserProcessor.isValidEmail('@domain.com')).toBe(false);
-        expect(UserProcessor.isValidEmail('')).toBe(false);
     });
+
+
+        test("processUsers should log valid users", () => {
+            const mockUsers = [
+                { id: 1, name: "Correct User", email: "ilan@gmail.com", company: { name: "someName" } },
+                { id: 2, name: "Invalid User", email: "invalid-email", company: { name: "someName" } }
+            ];
+    
+            const logger = winston.createLogger(); // Get the mocked logger
+    
+            UserProcessor.processUsers(mockUsers);
+    
+            expect(logger.info).toHaveBeenCalledWith(
+                expect.stringContaining(`ID: ${mockUsers[0].id}, Name: ${mockUsers[0].name}, Email: ${mockUsers[0].email}, Company: ${mockUsers[0].company.name}`)
+            );
+    
+            expect(logger.error).toHaveBeenCalledWith(
+                expect.stringContaining(`Invalid email for user ID ${mockUsers[1].id}: ${mockUsers[1].email}`)
+            );
+        });
 });
