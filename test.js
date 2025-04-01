@@ -112,6 +112,9 @@ describe('UserProcessor', () => {
         expect(logger.error).toHaveBeenCalledWith(
             expect.stringContaining(`Invalid email for user ID ${mockUsers[1].id}: ${mockUsers[1].email}`)
         );
+
+        expect(logger.info).toHaveBeenCalledTimes(1);
+        expect(logger.error).toHaveBeenCalledTimes(1);
     });
 
     test('processUsers should throw an error when given invalid input types', () => {    
