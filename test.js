@@ -86,7 +86,10 @@ describe('UserProcessor', () => {
         expect(UserProcessor.isValidEmail('@domain.com')).toBe(false);
         expect(UserProcessor.isValidEmail('test@ domain.com')).toBe(false);
         expect(UserProcessor.isValidEmail('test @domain.com')).toBe(false);
-        expect(UserProcessor.isValidEmail('@domain..com')).toBe(false);
+        expect(UserProcessor.isValidEmail('test@domain..com')).toBe(false);
+        expect(UserProcessor.isValidEmail('test@domain.com..il')).toBe(false);
+        expect(UserProcessor.isValidEmail('test@domain..com..il')).toBe(false);
+
     });
 
 
