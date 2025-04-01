@@ -31,7 +31,7 @@ class UserFetcher {
 
 class UserProcessor {
     static get EMAIL_REGEX() {
-        return /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+        return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     }
 
     static isValidEmail(email) {

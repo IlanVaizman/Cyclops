@@ -21,6 +21,7 @@ jest.mock('winston', () => {
     };
 });
 
+const logger = winston.createLogger();
 
 afterEach(() => {
     jest.clearAllMocks();
@@ -35,11 +36,18 @@ describe('UserFetcher', () => {
         
         axios.get.mockResolvedValue({ data: mockUsers , status: 200 });
         const result = await UserFetcher.fetchUsers();
+        
         expect(result).toEqual(mockUsers);
     });
 
     test('fetchUsers should return empty array from API when there is no users', async () => {
         axios.get.mockResolvedValue({ data: [], status: 200 });
+        const result = await UserFetcher.fetchUsers();
+        expect(result).toEqual([]);
+    });
+
+    test('fetchUsers should return empty array when API response is invalid', async () => {
+        axios.get.mockResolvedValue({ status: 200 });
         const result = await UserFetcher.fetchUsers();
         expect(result).toEqual([]);
     });
@@ -67,6 +75,9 @@ describe('UserProcessor', () => {
         expect(UserProcessor.isValidEmail('test@domain')).toBe(false);
         expect(UserProcessor.isValidEmail('test')).toBe(false);
         expect(UserProcessor.isValidEmail('@domain.com')).toBe(false);
+        expect(UserProcessor.isValidEmail('test@ domain.com')).toBe(false);
+        expect(UserProcessor.isValidEmail('test @domain.com')).toBe(false);
+        expect(UserProcessor.isValidEmail('@domain..com')).toBe(false);
     });
 
 
@@ -75,9 +86,7 @@ describe('UserProcessor', () => {
             { id: 1, name: "Correct User", email: "correct@gmail.com", company: { name: "someName" } },
             { id: 2, name: "Invalid User", email: "invalid-email", company: { name: "someName" } }
         ];
-    
-        const logger = winston.createLogger();
-    
+        
         UserProcessor.processUsers(mockUsers);
     
         expect(logger.info).toHaveBeenCalledWith(
@@ -87,5 +96,14 @@ describe('UserProcessor', () => {
         expect(logger.error).toHaveBeenCalledWith(
             expect.stringContaining(`Invalid email for user ID ${mockUsers[1].id}: ${mockUsers[1].email}`)
         );
+    });
+
+    test('processUsers should do nothing when given an empty list', () => {
+        const logger = winston.createLogger();
+        
+        UserProcessor.processUsers([]);
+        
+        expect(logger.info).not.toHaveBeenCalled();
+        expect(logger.error).not.toHaveBeenCalled();
     });
 });
