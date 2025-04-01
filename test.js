@@ -47,7 +47,7 @@ describe('UserFetcher', () => {
     });
 
     test('fetchUsers should return empty array when API response is invalid', async () => {
-        axios.get.mockResolvedValue({ status: 200 });
+        axios.get.mockResolvedValue({ status: 200 }); // No data property in the response
         await expect(UserFetcher.fetchUsers()).rejects.toThrow("Failed to fetch users: Cannot read properties of undefined (reading 'length')");
 
         axios.get.mockResolvedValue({ status: 404 });
